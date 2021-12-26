@@ -1,9 +1,6 @@
 package View;
 
 import java.awt.BorderLayout;
-
-
-
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -16,7 +13,6 @@ import Model.ObjectWrapper;
 import Model.Participant;
 import Model.Player;
 import Model.Rank;
-import Model.Selected;
 import View.RankView;
 
 import javax.swing.JLabel;
@@ -135,7 +131,7 @@ public class ProfilePlayerView extends JFrame {
 		}
 		
 		Game g=(Game) data.getData();
-			int bt=JOptionPane.showConfirmDialog(null,"Player "+g.getPlayer1().getUsername()+" invite you to game" , player.getUsername()+"'s Confirm invite", JOptionPane.YES_NO_OPTION);
+			int bt=JOptionPane.showConfirmDialog(null,"Player "+g.getPlayer1().getPlayer().getUsername()+" invite you to game" , player.getUsername()+"'s Confirm invite", JOptionPane.YES_NO_OPTION);
 			if(bt==JOptionPane.YES_OPTION) {
 				mysocket.sendData(new ObjectWrapper(ObjectWrapper.SENT_ACCEPT_CHALLENGE, g));
 				
@@ -158,7 +154,7 @@ public class ProfilePlayerView extends JFrame {
 		//}
 	}
 	public void receiveDataStartGamePlay(ObjectWrapper data) {
-	Participant p= (Participant) data.getData();
+	Game p= (Game) data.getData();
 		
 		GameView gv=new GameView(mysocket,player,p);
 		gv.setVisible(true);

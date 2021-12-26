@@ -1,6 +1,7 @@
 package Controller;
 
 import java.net.InetAddress;
+
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -9,7 +10,6 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import Interface.PlayerInterface;
 import Interface.RankInterface;
-import Interface.SelectedInterface;
 import Interface.FriendInterface;
 import Interface.GameInterface;
 import Interface.ParticipantInterface;
@@ -19,9 +19,8 @@ import Model.IPAddress;
 import Model.Participant;
 import Model.Player;
 import Model.Rank;
-import Model.Selected;
 import View.ServerMainFrm;
-public class ServerCtr extends UnicastRemoteObject implements PlayerInterface,FriendInterface, RankInterface,GameInterface,ParticipantInterface,SelectedInterface{
+public class ServerCtr extends UnicastRemoteObject implements PlayerInterface,FriendInterface, RankInterface,GameInterface,ParticipantInterface{
 	private static final long serialVersionUID = 1L;
 	private IPAddress myAddress = new IPAddress("localhost", 9999);     // default server host/port
     private Registry registry;
@@ -172,14 +171,7 @@ public class ServerCtr extends UnicastRemoteObject implements PlayerInterface,Fr
 		}
 		return null;
 	}
-	@Override
-	public Selected createSelected(Selected se) throws RemoteException {
-		// TODO Auto-generated method stub
-		//System.out.println("chay qua ham createselect server rmi");
-		if(new SelectedDAO().createSelected(se))
-			return se;
-		return null;
-	}
+
 
 	@Override
 	public Participant createParticipant(Participant p) throws RemoteException {
@@ -208,13 +200,6 @@ public class ServerCtr extends UnicastRemoteObject implements PlayerInterface,Fr
 		// TODO Auto-generated method stub
 		return new GameDAO().updateGame(g);
 	}
-
-	@Override
-	public boolean updateSelected(Selected se) throws RemoteException {
-		// TODO Auto-generated method stub
-		return new SelectedDAO().updateSelected(se);
-	}
-
 	@Override
 	public ArrayList<Player> searchPlayer(String key) throws RemoteException {
 		// TODO Auto-generated method stub

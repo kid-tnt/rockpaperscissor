@@ -3,12 +3,12 @@ package Controller;
 import java.rmi.RemoteException;
 
 
+
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import Interface.PlayerInterface;
 import Interface.RankInterface;
-import Interface.SelectedInterface;
 import Interface.FriendInterface;
 import Interface.GameInterface;
 import Interface.ParticipantInterface;
@@ -18,7 +18,6 @@ import Model.IPAddress;
 import Model.Participant;
 import Model.Player;
 import Model.Rank;
-import Model.Selected;
  
 public class ClientCtrRMI {
  //   private LoginView view;
@@ -28,7 +27,6 @@ public class ClientCtrRMI {
     private RankInterface rankRO;
     private GameInterface gameRO;
     private ParticipantInterface paRO;
-    private SelectedInterface seRO;
     private IPAddress serverAddress = new IPAddress("localhost", 9999); //default server address
     private String rmiService = "rmiServer";                            //default server service key
      
@@ -53,7 +51,7 @@ public class ClientCtrRMI {
             rankRO= (RankInterface) registry.lookup(rmiService);
             gameRO=(GameInterface) registry.lookup(rmiService);
             paRO=(ParticipantInterface) registry.lookup(rmiService);
-            seRO=(SelectedInterface) registry.lookup(rmiService);
+           
         //   view.setServerHost(serverAddress.getHost(), serverAddress.getPort()+"", rmiService);
             System.out.println("Found the remote objects at the host: " + serverAddress.getHost() + ", port: " + serverAddress.getPort());
         }catch(Exception e){
@@ -214,27 +212,7 @@ public class ClientCtrRMI {
 		return false;
 	}
  }
- public Selected remoteCreateSelected(Selected se) {
-	 
-	 try {
-		// System.out.println("chay qua remotecreateSelected");
-		return seRO.createSelected(se);
-	} catch (Exception e) {
-		e.printStackTrace();
-		return null;
-		// TODO: handle exception
-	}
- }
- public boolean remoteUpdateSelected(Selected se) {
-	 try {
-		 return seRO.updateSelected(se);
-		
-	} catch (Exception e) {
-		// TODO: handle exception
-		e.printStackTrace();
-		return false;
-	}
- }
+ 
  public ArrayList<Player> remoteSearchPlayer(String key) {
 	 try {
 		// System.out.println(key+playerRO.searchPlayer(key).size()+" test clientRMI");

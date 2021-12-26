@@ -1,6 +1,7 @@
 package View;
 
 import java.awt.BorderLayout;
+
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -12,16 +13,11 @@ import Model.Game;
 import Model.ObjectWrapper;
 import Model.Participant;
 import Model.Player;
-import Model.Selected;
-import Model.Weapon;
-
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.ImageIcon;
@@ -38,25 +34,16 @@ public class GameView extends JFrame {
 	private Timer timer;
 	private JButton btnRock, btnPaper, btnScissor;
 	private ImageIcon selected;
-	private Selected se1,se2;
-	private Weapon wp;
 	private ClientCtr socket;
 	private Game g;
-	private Participant pa;
-	private Player player;
-//	private ArrayList<Selected> lise;//list selecte1 send to server
-	private JLabel lblresult,lblselect1,lblselect2;
 
-	/**
-	 * Launch the application.
-	 */
-	/**
-	 * Create the frame.
-	 */
-	public GameView( ClientCtr socket,Player player,Participant p) {
+	private Player player;
+
+	private JLabel lblresult,lblselect1,lblselect2;
+	public GameView( ClientCtr socket,Player player,Game p) {
 		this.socket=socket;
 		this.player=player;
-		this.pa=p;
+		this.g=p;
 		//System.out.print(player.getId()+"Test gameView ID");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 796, 577);
@@ -101,7 +88,7 @@ public class GameView extends JFrame {
 		pnMainGame.add(pnplayer1);
 		pnplayer1.setLayout(null);
 		
-		JLabel lblname1 = new JLabel("Player1 "+ p.getGame().getPlayer1().getUsername());
+		JLabel lblname1 = new JLabel("Player1 "+ p.getPlayer1().getPlayer().getUsername());
 		lblname1.setFont(new Font("Tahoma", Font.BOLD, 15));
 		lblname1.setHorizontalAlignment(SwingConstants.CENTER);
 		lblname1.setBounds(33, 10, 296, 44);
@@ -119,7 +106,7 @@ public class GameView extends JFrame {
 		pnMainGame.add(pnplayer2);
 		pnplayer2.setLayout(null);
 		
-		JLabel lblname2 = new JLabel("Player2 "+ p.getGame().getPlayer2().getUsername());
+		JLabel lblname2 = new JLabel("Player2 "+ p.getPlayer2().getPlayer().getUsername());
 		lblname2.setHorizontalAlignment(SwingConstants.CENTER);
 		lblname2.setFont(new Font("Tahoma", Font.BOLD, 15));
 		lblname2.setBounds(47, 10, 296, 44);
@@ -153,22 +140,21 @@ public class GameView extends JFrame {
 				btnScissor.setEnabled(false);
 				btnRock.setEnabled(false);
 				timer.stop();
-				wp=new Weapon(1, "Rock", "Bua");
-			Selected se=new Selected();
-				se.setWeapon(wp);
-				se.setGame(p.getGame());
-				//display image ;
+			
 				selected =new ImageIcon(GameView.class.getResource("/images/rock.png"));
-				if(player.getId()==p.getGame().getPlayer1().getId()) {
+				if(p.getPlayer1().getPlayer().getId()==player.getId()) {
 					lblselect1.setIcon(selected);	
+					p.setSe1(1);
 				}
 				else {
 					lblselect2.setIcon(selected);
+					p.setSe2(1);
 				}
-				se.setParticipant(p);	
-				socket.sendData(new ObjectWrapper(ObjectWrapper.SENT_SELECTED_WEAPON,se));
+			//	se.setParticipant(p);	
+			
+				socket.sendData(new ObjectWrapper(ObjectWrapper.SENT_SELECTED_WEAPON,p));
 				socket.sendData(new ObjectWrapper(ObjectWrapper.SENT_GET_RESULT, p));
-				//socket.getActiveFunction().add(new ObjectWrapper(ObjectWrapper.REPLY_RESULT,this ));
+				
 			}
 		});
 		btnRock.setFont(new Font("Tahoma", Font.BOLD, 15));
@@ -182,22 +168,18 @@ public class GameView extends JFrame {
 				btnRock.setEnabled(false);
 				btnScissor.setEnabled(false);
 				timer.stop();
-				wp=new Weapon(2, "Paper", "Giay");
-			Selected se=new Selected();
-				se.setWeapon(wp);
-				se.setGame(p.getGame());
 				selected =new ImageIcon(GameView.class.getResource("/images/paper.png"));
-				if(player.getId()==p.getGame().getPlayer1().getId()) {
+				if(p.getPlayer1().getPlayer().getId()==player.getId()) {
 					lblselect1.setIcon(selected);
+					p.setSe1(2);
 				
 				}
 				else {
 					lblselect2.setIcon(selected);
+					p.setSe2(2);
 				}
-				se.setParticipant(p);
-				socket.sendData(new ObjectWrapper(ObjectWrapper.SENT_SELECTED_WEAPON,se));
+				socket.sendData(new ObjectWrapper(ObjectWrapper.SENT_SELECTED_WEAPON,p));
 				socket.sendData(new ObjectWrapper(ObjectWrapper.SENT_GET_RESULT, p));
-				//socket.getActiveFunction().add(new ObjectWrapper(ObjectWrapper.REPLY_RESULT, this));
 			}
 		});
 		btnPaper.setFont(new Font("Tahoma", Font.BOLD, 15));
@@ -210,23 +192,20 @@ public class GameView extends JFrame {
 				btnPaper.setEnabled(false);
 				btnScissor.setEnabled(false);
 				timer.stop();
-				wp=new Weapon(3, "Scissorr", "Keo");
-			Selected	se=new Selected();
-				se.setWeapon(wp);
-				se.setGame(p.getGame());
 				selected =new ImageIcon(GameView.class.getResource("/images/scisors.png"));
-				if(player.getId()==se.getGame().getPlayer1().getId()) {
+				if(p.getPlayer1().getPlayer().getId()==player.getId()) {
 					lblselect1.setIcon(selected);
+					p.setSe1(3);
+					
 				}
 				
 				else {
 					lblselect2.setIcon(selected);
+					p.setSe2(3);
 				
 				}
-				se.setParticipant(p);
-				socket.sendData(new ObjectWrapper(ObjectWrapper.SENT_SELECTED_WEAPON,se));
+				socket.sendData(new ObjectWrapper(ObjectWrapper.SENT_SELECTED_WEAPON,p));
 				socket.sendData(new ObjectWrapper(ObjectWrapper.SENT_GET_RESULT, p));
-				//socket.getActiveFunction().add(new ObjectWrapper(ObjectWrapper.REPLY_RESULT, this));
 			}
 		});
 		btnScissor.setFont(new Font("Tahoma", Font.BOLD, 15));
@@ -249,33 +228,31 @@ public class GameView extends JFrame {
 					//set random weapon
 					int rand= new Random().nextInt(3)+1;
 					if(rand==1) {
-						wp=new Weapon(1, "Rock","Bua");
+					//	wp=new Weapon(1, "Rock","Bua");
 						selected =new ImageIcon(GameView.class.getResource("/images/rock.png"));
+						
 					}
 					if(rand==2) {
-						wp=new Weapon(2, "Paper", "Giay");
+					//	wp=new Weapon(2, "Paper", "Giay");
 						selected =new ImageIcon(GameView.class.getResource("/images/paper.png"));
 					}
 					if(rand==3) {
-						wp=new Weapon(3, "Scissor", "Keo");
+					//	wp=new Weapon(3, "Scissor", "Keo");
 						selected =new ImageIcon(GameView.class.getResource("/images/scisors.png"));
 					}
-					Selected serd=new Selected();
-					if(player.getId()==p.getGame().getPlayer1().getId()) {
+					//Selected serd=new Selected();
+					if(p.getPlayer1().getPlayer().getId()==player.getId()) {
 						lblselect1.setIcon(selected);
-						serd.setWeapon(wp);
+						p.setSe1(rand);
 					}
 					else {
 						lblselect2.setIcon(selected);
+						p.setSe2(rand);
 						
 					
 				}
-					serd.setWeapon(wp);
-					serd.setParticipant(p);
-					serd.setGame(p.getGame());
-					socket.sendData(new ObjectWrapper(ObjectWrapper.SENT_SELECTED_WEAPON,serd));
+					socket.sendData(new ObjectWrapper(ObjectWrapper.SENT_SELECTED_WEAPON,p));
 					socket.sendData(new ObjectWrapper(ObjectWrapper.SENT_GET_RESULT, p));
-				//	socket.getActiveFunction().add(new ObjectWrapper(ObjectWrapper.REPLY_RESULT, this));
 					
 				
 				
@@ -297,7 +274,7 @@ public class GameView extends JFrame {
 	//	System.out.println(tmp.getResult());
 		lblresult.setText(tmp.getResult());
 			lblresult.repaint();
-			if(player.getId()==tmp.getPlayer1().getId()) {
+			if(player.getId()==g.getPlayer1().getPlayer().getId()) {
 				if(tmp.getSe2()==1) {
 					lblselect2.setIcon(new ImageIcon(GameView.class.getResource("/images/rock.png")));
 				}

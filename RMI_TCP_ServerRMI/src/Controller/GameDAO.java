@@ -15,15 +15,20 @@ public class GameDAO extends DAO{
 		// TODO Auto-generated constructor stub
 	}
 	public boolean createGame(Game game) {
-	 String sql="INSERT INTO gametest.tblgame(idplayer1,idplayer2,starttime,endtime,result) VALUES(?,?,?,?,?)";
+	//createGame	
+	 String sql="INSERT INTO gametest.tblgame(idparticipant1,idparticipant2,se1,se2,result,starttime,endtime) VALUES(?,?,?,?,?,?,?)";
 		 
 		 try {
 			 PreparedStatement ps= con.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
 			 ps.setInt(1, game.getPlayer1().getId());
 			 ps.setInt(2,game.getPlayer2().getId());
-			 ps.setString(3, game.getStartTime());
-			 ps.setString(4, game.getEndTime());
+			 ps.setInt(3, game.getSe1());
+			 ps.setInt(4, game.getSe2());
 			 ps.setString(5, game.getResult());
+			 ps.setString(6, game.getStartTime());
+			 ps.setString(7, game.getEndTime());
+			 
+			 
 			// ps.setString(2,);
 			 ps.executeUpdate();
 			  ResultSet generatedKeys = ps.getGeneratedKeys();
@@ -41,7 +46,7 @@ public class GameDAO extends DAO{
 		
 	}
 	public boolean updateGame(Game game) {
-	     String sql = "UPDATE gametest.tblgame SET starttime=?, endtime =?, result=?,idplayer1=?,idplayer2=? WHERE id=?";
+	     String sql = "UPDATE gametest.tblgame SET starttime=?, endtime =?, result=?,idparticipant1=?,idparticipant2=?,se1=?,se2=? WHERE id=?";
 	     try {
 	    	 PreparedStatement ps=con.prepareStatement(sql);
 	    	 ps.setString(1,game.getStartTime());
@@ -49,7 +54,9 @@ public class GameDAO extends DAO{
 	    	ps.setString(3,game.getResult());
 	    	ps.setInt(4, game.getPlayer1().getId());
 	    	 ps.setInt(5,game.getPlayer2().getId());
-	    	 ps.setInt(6, game.getId());
+	    	 ps.setInt(6, game.getSe1());
+	    	 ps.setInt(7, game.getSe2());
+	    	 ps.setInt(8, game.getId());
 	    	 
 	    	ps.executeUpdate();
 	    	
