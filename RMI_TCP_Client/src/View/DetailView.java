@@ -11,6 +11,7 @@ import javax.swing.border.EmptyBorder;
 
 import Controller.ClientCtr;
 import Model.ObjectWrapper;
+import Model.Participant;
 import Model.Player;
 import Model.Rank;
 
@@ -71,8 +72,18 @@ public class DetailView extends JFrame {
 				int dialogbt=JOptionPane.showConfirmDialog(null, "Would you like invite "+ playerdetail.getUsername()+" to game?", "Invite", JOptionPane.YES_NO_OPTION);
 				if(dialogbt==JOptionPane.YES_OPTION) {
 					Game g=new Game();
-					g.setPlayer1(player);
-					g.setPlayer2(playerdetail);
+					//g.setPlayer1(player);
+					Participant p1=new Participant();
+					p1.setPlayer(player);
+					g.setPlayer1(p1);
+					Participant p2=new Participant();
+					p2.setPlayer(playerdetail);
+					g.setPlayer2(p2);
+				//	g.getPlayer1().setPlayer(player);
+					//g.setPlayer2(playerdetail);
+					//g.getPlayer2().setPlayer(playerdetail);
+					//System.out.println(g.getPlayer1().getPlayer().getUsername());
+				//	System.out.println(g.getPlayer2().getPlayer().getUsername());
 					mysocket.sendData(new ObjectWrapper(ObjectWrapper.SENT_CHALLENGE, g));
 				}
 				

@@ -3,6 +3,7 @@ package Controller;
 import java.io.EOFException;
 
 
+
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
@@ -23,7 +24,6 @@ import Model.ObjectWrapper;
 import Model.Participant;
 import Model.Player;
 import Model.Rank;
-import Model.Selected;
 import View.ServerMainFrm;
 import Controller.ClientCtrRMI;
 
@@ -131,7 +131,7 @@ public class ServerCtr {
         private Socket mySocket;
         private Player player;
      //   private ArrayList<Selected> listSe;
-        private Selected se1,se2;
+     //   private Selected se1,se2;
         public ServerProcessing(Socket s) {
             super();
             mySocket = s;  
@@ -160,7 +160,7 @@ public class ServerCtr {
                 e.printStackTrace();
             }
         }  
-		public synchronized Game getResult(int gameid) {
+		public Game getResult(int gameid) {
 			if(listGame.size()!=0) {
 				for(Game g: listGame) {
 					if(g.getId()==gameid)
@@ -175,9 +175,6 @@ public class ServerCtr {
         	//Create client RMI and connect to RMI server
         	ClientCtrRMI rmi=new ClientCtrRMI();
         	rmi.init();
-        	//listSe=new ArrayList<Selected>();
-        	//listSe.add(se1);
-        	//listSe.add(se2);
             try {
                 while(true) {
                     ObjectInputStream ois = new ObjectInputStream(mySocket.getInputStream());
@@ -252,122 +249,132 @@ public class ServerCtr {
                     		  break;
                     	  }
                     	  else {
-                    		  sendDataToUser(new ObjectWrapper(ObjectWrapper.REPLY_SENT_CHALLENGE,g), g.getPlayer2().getId());
+                    		  sendDataToUser(new ObjectWrapper(ObjectWrapper.REPLY_SENT_CHALLENGE,g), g.getPlayer2().getPlayer().getId());
                         	  break;
                     	  }
                     	 
                       case ObjectWrapper.SENT_ACCEPT_CHALLENGE: 
                     	Game gs=(Game) data.getData();
-                    	  playerBusy.add(gs.getPlayer1().getId());
-                    	  playerBusy.add(gs.getPlayer2().getId());
+                    	  playerBusy.add(gs.getPlayer1().getPlayer().getId());
+                    	  playerBusy.add(gs.getPlayer2().getPlayer().getId());
                     	  publiclistBusy();
                     	  SimpleDateFormat spd=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     	  gs.setStartTime(spd.format(new Date()));
+                    	  Participant p1=rmi.remoteCreateParticipant(gs.getPlayer1());
+                    	  Participant p2=rmi.remoteCreateParticipant(gs.getPlayer2());
+                    	  gs.setPlayer1(p1);
+                    	  gs.setPlayer2(p2);
                     	  gs=rmi.remoteCreateGame(gs);//save to CSDL
                     	  listGame.add(gs);
-                    //	  System.out.println(gs.getPlayer1().getUsername()+" Test name playerstart serverTCP"); 
-                    //	 System.out.println(gs.getId()+"Test Server TCP game id");
-                    	 //create pa1;
-                    	  Participant pa1= new Participant();
-                    	  pa1.setPlayer(gs.getPlayer1());
-                    	  pa1.setGame(gs);
-                    	  pa1=rmi.remoteCreateParticipant(pa1);
-                    	//  System.out.println("test pa"+ pa1.getId()+" "+ pa1.getPlayer().getUsername()+ pa1.getGame().getStartTime());
-                  
-                    	  Participant pa2=new Participant();
-                    	  pa2.setPlayer(gs.getPlayer2());
-                    	  pa2.setGame(gs);
-                    	  pa2=rmi.remoteCreateParticipant(pa2);
-                    	  sendDataToUser(new ObjectWrapper(ObjectWrapper.SENT_START_GAME, pa1), pa1.getPlayer().getId());
-                    	  sendDataToUser(new ObjectWrapper(ObjectWrapper.SENT_START_GAME, pa2),pa2.getPlayer().getId());
-                   	  
+                 
+                    	  sendDataToUser(new ObjectWrapper(ObjectWrapper.SENT_START_GAME, gs), gs.getPlayer1().getPlayer().getId());
+                    	  sendDataToUser(new ObjectWrapper(ObjectWrapper.SENT_START_GAME, gs),gs.getPlayer2().getPlayer().getId());
+                    	 
                     	  break;
                       case ObjectWrapper.SENT_REFUSE_CHALLENGE: 
                     	 Game gre=(Game) data.getData();
-                    	  sendDataToUser(new ObjectWrapper(ObjectWrapper.REPLY_REFUSE_CHALLENGE,"none"), gre.getPlayer1().getId());
+                    	  sendDataToUser(new ObjectWrapper(ObjectWrapper.REPLY_REFUSE_CHALLENGE,"none"), gre.getPlayer1().getPlayer().getId());
                     	  
                     	  break;
                     case ObjectWrapper.SENT_SELECTED_WEAPON:
-                    	  Selected sesent= (Selected) data.getData();
-                    	 sesent= rmi.remoteCreateSelected(sesent);
+                    	Game gamesent=(Game) data.getData();
+                    //	System.out.println("Test serverTCP game id "+ gamesent.getId()
+                    //	+ "test paid"+ gamesent.getPlayer1().getId()+ " vs "+ gamesent.getPlayer2().getId()+" "+ gamesent.getSe1() +"vs"+ gamesent.getSe2());
+                    //	rmi.remoteUpdate(gamesent);
+                    	 // Selected sesent= (Selected) data.getData();
+                    	// sesent= rmi.remoteCreateSelected(sesent);
                     	//  System.out.println("Test se weapon "+ sesent.getId());
                     	  for(Game gg: listGame) {
-                    		  if(gg.getId()==sesent.getGame().getId()) {
-                    			 if( gg.getPlayer1().getId()==sesent.getParticipant().getPlayer().getId()) 
-                          			gg.setSe1(sesent.getWeapon().getId());
-                    			 else gg.setSe2(sesent.getWeapon().getId());
-                    		  }
+                    		
+                    			  if(gg.getId()==gamesent.getId()) {
+                    				
+                    			//	  System.out.println("Test thông tin game trong list");
+                    			//	  System.out.println(gg.getId()+" "+gg.getPlayer1().getId()+ " "+ gg.getPlayer2().getId()+ " ");
+                    				//  int s1=gamesent.getSe1();
+                         			 if(gg.getSe1()==0) {
+                         				gg.setSe1(gamesent.getSe1());
+                         			 }
+                         			 if(gg.getSe2()==0) {
+                         				 gg.setSe2(gamesent.getSe2());
+                         			 }
+                         			// System.out.println("Test Server TCP select"+ gg.getSe1()+ "vs"+ gg.getSe2());
+                         			
+                         		  rmi.remoteUpdate(gg);
+							}
+                    		 
                     			  
                     		  
                     	  } 
+                    	 // rmi.remoteUpdate(gamesent);
+                    	 
                     	  break;
                     case ObjectWrapper.SENT_GET_RESULT: 
-                    	Participant prs=(Participant) data.getData();
-                    	Game tmp=getResult(prs.getGame().getId());
+                    	//Participant prs=(Participant) data.getData();
+                    	Game prs=(Game) data.getData();
+                    	Game tmp=getResult(prs.getId());// get game in listgame
                     	if(tmp.getSe1()==0|| tmp.getSe2()==0)
 							break;
-                    	synchronized(this) {
-                    		
-                        	//System.out.println("test tmp "+tmp.getId()+" "+tmp.getSe1()+" "+tmp.getSe2()+" " + tmp.getResult()+" "+ tmp.getEndTime());
+                    	else {
+                    		//System.out.println("test tmp "+tmp.getId()+" "+tmp.getSe1()+" "+tmp.getSe2()+" " + tmp.getResult()+" "+ tmp.getEndTime());
                         	int wp1=tmp.getSe1();
                         	int wp2=tmp.getSe2();
                         //	if(prs.getGame().getPlaye)
                         	if(wp1==wp2) {
-                        		prs.getGame().setResult("Draw. same weapon");
-                        		prs.setScore(0.5f);
+                        		tmp.setResult("Draw. same weapon");
+                        		tmp.getPlayer1().setScore(0.5f);
+                        		tmp.getPlayer2().setScore(0.5f);
                         	}
                         	if(wp1==1 && wp2==2) {
-                        		prs.getGame().setResult(prs.getGame().getPlayer2().getUsername()+ " win");
-                        		if(prs.getGame().getPlayer1().getId()==prs.getPlayer().getId())
-                    			prs.setScore(0f);
-                    		else prs.setScore(1f);
+                        		tmp.setResult(tmp.getPlayer2().getPlayer().getUsername()+ " win");
+                        		tmp.getPlayer1().setScore(0f);
+                        		tmp.getPlayer2().setScore(1f);
+                        		
                         	}
                         	if(wp1==1 && wp2==3) {
-                        		prs.getGame().setResult(prs.getGame().getPlayer1().getUsername()+" win");
-                        		if(prs.getGame().getPlayer1().getId()==prs.getPlayer().getId())
-                        			prs.setScore(1f);
-                        		else prs.setScore(0f);
+                        		tmp.setResult(tmp.getPlayer1().getPlayer().getUsername()+" win");
+                        		tmp.getPlayer1().setScore(1f);
+                        		tmp.getPlayer2().setScore(0f);
                         	}
                         	if(wp1==2 && wp2==3) {
-                        		prs.getGame().setResult(prs.getGame().getPlayer2().getUsername()+ " win");
-                        		if(prs.getGame().getPlayer1().getId()==prs.getPlayer().getId())
-                        			prs.setScore(0f);
-                        		else prs.setScore(1f);
+                        		tmp.setResult(tmp.getPlayer2().getPlayer().getUsername()+ " win");
+                        		tmp.getPlayer1().setScore(0f);
+                        		tmp.getPlayer2().setScore(1f);
                         	}
                         	if(wp1==2 && wp2==1) {
-                        		prs.getGame().setResult(prs.getGame().getPlayer1().getUsername()+ " win");
-                        		if(prs.getGame().getPlayer1().getId()==prs.getPlayer().getId())
-                        			prs.setScore(1f);
-                        		else prs.setScore(0f);
+                        		tmp.setResult(tmp.getPlayer1().getPlayer().getUsername()+ " win");
+                        		tmp.getPlayer1().setScore(1f);
+                        		tmp.getPlayer2().setScore(0f);
                         	}
                         	if(wp1==3 && wp2==1) {
-                        		prs.getGame().setResult(prs.getGame().getPlayer2().getUsername()+" win");
-                        		if(prs.getGame().getPlayer1().getId()==prs.getPlayer().getId())
-                        			prs.setScore(0f);
-                        		else prs.setScore(1f);
+                        		tmp.setResult(tmp.getPlayer2().getPlayer().getUsername()+" win");
+                        		tmp.getPlayer1().setScore(0f);
+                        		tmp.getPlayer2().setScore(1f);
                         	}
                         	if(wp1==3 && wp2==2) {
-                        		prs.getGame().setResult(prs.getGame().getPlayer1().getUsername()+ " win");
-                        		if(prs.getGame().getPlayer1().getId()==prs.getPlayer().getId())
-                        			prs.setScore(1f);
-                        		else prs.setScore(0f);
+                        		tmp.setResult(tmp.getPlayer1().getPlayer().getUsername()+ " win");
+                        		tmp.getPlayer1().setScore(1f);
+                        		tmp.getPlayer2().setScore(0f);
                         	}
-                        	tmp.setResult(prs.getGame().getResult());
-                    	}
+                        	//tmp.setResult(prs.getResult());
+                    	
                     	
                     	
                     	
                     	SimpleDateFormat spf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    	prs.getGame().setEndTime(spf.format(new Date()));
-                    	rmi.remoteUpdate(prs.getGame());
-                    	rmi.remoteUpdateParticipant(prs);
+                    	tmp.setEndTime(spf.format(new Date()));
+                    	rmi.remoteUpdate(tmp);
+                    	rmi.remoteUpdateParticipant(tmp.getPlayer1());
+                    	rmi.remoteUpdateParticipant(tmp.getPlayer2());
                     //	System.out.println("Test result"+ prs.getGame().getResult());
                     //	System.out.println("Test Score participant "+ prs.getScore());
                     	
                     	//sendDataT(new ObjectWrapper(ObjectWrapper.REPLY_RESULT, tmp));
-                    	sendDataToUser(new ObjectWrapper(ObjectWrapper.REPLY_RESULT, tmp), tmp.getPlayer1().getId());
-                    	sendDataToUser(new ObjectWrapper(ObjectWrapper.REPLY_RESULT, tmp), tmp.getPlayer2().getId());
+                    	sendDataToUser(new ObjectWrapper(ObjectWrapper.REPLY_RESULT, tmp), tmp.getPlayer1().getPlayer().getId());
+                    	sendDataToUser(new ObjectWrapper(ObjectWrapper.REPLY_RESULT, tmp), tmp.getPlayer2().getPlayer().getId());
                     	listGame.remove(tmp);
+                    	}
+                    		
+                        
                     	//playerBusy.remove(new Integer(prs.getPlayer().getId()));
                     	break;
                     case ObjectWrapper.SEARCH_PLAYER:

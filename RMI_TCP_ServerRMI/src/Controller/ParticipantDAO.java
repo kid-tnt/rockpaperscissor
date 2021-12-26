@@ -45,13 +45,13 @@ public ArrayList<Rank> showRank(){
 	
 }
 public boolean createParticipant(Participant p) {//create a Participant and set player id 
-	 String sql="INSERT INTO gametest.tblparticipant (idplayer,idgame,score) VALUES(?,?,?)";
+	 String sql="INSERT INTO gametest.tblparticipant (idplayer,score) VALUES(?,?)";
 	 
 	 try {
 		 PreparedStatement ps= con.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
 		 ps.setInt(1,p.getPlayer().getId());
-		 ps.setInt(2,p.getGame().getId());
-		 ps.setFloat(3,p.getScore());
+		// ps.setInt(2,p.getGame().getId());
+		 ps.setFloat(2,p.getScore());
 		 ps.executeUpdate();
 		  ResultSet generatedKeys = ps.getGeneratedKeys();
             if (generatedKeys.next()) {
@@ -68,13 +68,13 @@ public boolean createParticipant(Participant p) {//create a Participant and set 
 	
 }
 public boolean updateParticipant(Participant p) {
-    String sql = "UPDATE gametest.tblparticipant SET idplayer=?, idgame =?, score=? WHERE id=?";
+    String sql = "UPDATE gametest.tblparticipant SET idplayer=?, score=? WHERE id=?";
     try {
    	 PreparedStatement ps=con.prepareStatement(sql);
    	 ps.setInt(1,p.getPlayer().getId());
-   	 ps.setInt(2,p.getGame().getId());
-   	ps.setFloat(3,p.getScore());
-   	 ps.setInt(4,p.getId());
+   //	 ps.setInt(2,p.getGame().getId());
+   	ps.setFloat(2,p.getScore());
+   	 ps.setInt(3,p.getId());
    	ps.executeUpdate();
    	
     }
